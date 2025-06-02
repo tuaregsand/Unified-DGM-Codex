@@ -315,6 +315,10 @@ export interface CodeMetadata {
   dependencies?: string[];
   complexity?: number;
   coverage?: number;
+  generatedAt?: string;
+  model?: string;
+  spec?: string;
+  modification?: boolean;
 }
 
 export interface StyleGuide {
@@ -638,5 +642,50 @@ export interface EvolutionConfig {
   backupRetention: number; // Days to keep backups
 }
 
+// Additional types for real AI model implementations
+export interface GPT41Config {
+  apiKey?: string;
+  modelName?: string;
+  apiEndpoint?: string;
+  maxTokensPerChunk?: number;
+  temperature?: number;
+  testFramework?: string;
+  testCoverageTarget?: number;
+  styleLearnFromExisting?: boolean;
+  checkpointAutoSave?: boolean;
+  checkpointMaxCheckpoints?: number;
+  checkpointPath?: string;
+  codeTemplatePath?: string;
+}
+
+export interface ClaudeSonnetConfig {
+  apiKey?: string;
+  apiEndpoint?: string;
+  reasoningCacheMaxEntries?: number;
+  reasoningCacheSimilarityThreshold?: number;
+  decisionTreeMaxDepth?: number;
+  decisionTreeMinSamplesLeaf?: number;
+  decisionTreePersistPath?: string;
+  toolSelectorLearningRate?: number;
+  toolSelectorExplorationRate?: number;
+  toolSelectorMatrixPath?: string;
+  planTemplatePath?: string;
+}
+
+export interface CodeSpecSecondary {
+  description: string;
+  language?: string;
+  existingCode?: string;
+  maxTokensPerChunk?: number;
+  temperature?: number;
+  styleGuide?: StyleGuide;
+}
+
+export interface ProjectContextSecondary {
+  projectPath: string;
+  currentFileContent?: string;
+  files?: string[];
+}
+
 // Additional exports for backward compatibility
-export type { Tool, BenchmarkResults, BenchmarkResult }; 
+export type { Tool as ToolType, BenchmarkResults as BenchmarkResultsType, BenchmarkResult as BenchmarkResultType }; 

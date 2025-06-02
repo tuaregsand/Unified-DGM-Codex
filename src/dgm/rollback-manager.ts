@@ -12,7 +12,7 @@ import {
   BenchmarkResults,
   Mutation
 } from '../types';
-import { createLogger } from 'winston';
+import * as winston from 'winston';
 
 export interface RollbackConfig {
   workingDir: string;
@@ -24,12 +24,12 @@ export interface RollbackConfig {
 
 export class RollbackManager {
   private git: SimpleGit;
-  private logger = createLogger({
+  private logger = winston.createLogger({
     level: 'info',
-    format: createLogger.format.json(),
+    format: winston.format.json(),
     transports: [
-      new createLogger.transports.Console(),
-      new createLogger.transports.File({ filename: './data/evolution-history/rollback.log' })
+      new winston.transports.Console(),
+      new winston.transports.File({ filename: './data/evolution-history/rollback.log' })
     ]
   });
 

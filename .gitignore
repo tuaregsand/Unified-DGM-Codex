@@ -92,6 +92,12 @@ temp/
 *.bin
 *.h5
 
+# Research report
+research_report.md 
+ai_agent_context.md 
+context.md 
+
+
 # API keys and sensitive data
 secrets/
 keys/

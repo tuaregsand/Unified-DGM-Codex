@@ -5,16 +5,19 @@ import { PlanTemplates, PlanStep } from './plan-templates';
 import { ExecutionPlan } from '../../types';
 import { ClaudeSonnetConfig, ProjectContext } from '../../types';
 
-// Placeholder for actual Anthropic API client
-// This would typically use @anthropic-ai/sdk
-class ClaudeApiClient {
-  private apiKey: string;
-  private apiEndpoint: string;
+import Anthropic from '@anthropic-ai/sdk';
 
-  constructor(apiKey?: string, apiEndpoint?: string) {
-    this.apiKey = apiKey || process.env.ANTHROPIC_API_KEY || 'your_anthropic_key';
-    this.apiEndpoint = apiEndpoint || process.env.CLAUDE_ENDPOINT || 'https://api.anthropic.com/v1';
-    if (!this.apiKey) throw new Error('Anthropic API key is missing.');
+// Real Anthropic API client
+class ClaudeApiClient {
+  private client: Anthropic;
+
+  constructor(apiKey?: string) {
+    const key = apiKey || process.env.ANTHROPIC_API_KEY;
+    if (!key) throw new Error('Anthropic API key is missing.');
+    
+    this.client = new Anthropic({
+      apiKey: key,
+    });
   }
 
   async think(params: { 
@@ -25,36 +28,113 @@ class ClaudeApiClient {
     tool_choice?: any;
     system?: string;
   }): Promise<{ planData: any; reasoningTrace?: string[] }> {
-    // Mock Claude API call for planning
-    console.log(`[ClaudeApiClient] Claude thinking with prompt (first 100): ${params.prompt.substring(0, 100)}... Mode: ${params.mode}`);
-    // In a real scenario, this would make an API call to Claude
-    // and parse the response to extract the plan and reasoning.
-    // The 'tools' and 'tool_choice' parameters would be part of the API request.
-    
-    // Simulate thinking time
-    await new Promise(resolve => setTimeout(resolve, Math.min(params.maxThinkingTime || 5000, 1000)));
-    
-    return {
-      planData: {
-        steps: [
-          { 
-            type: 'analysis', 
-            spec: { query: params.prompt, depth: 'detailed' },
-            description: 'Analyze the request and gather context'
-          }, 
-          { 
-            type: 'code_generation', 
-            spec: { description: 'Implement based on analysis', language: 'typescript' },
-            description: 'Generate code implementation'
+    try {
+      console.log(`[ClaudeApiClient] Making REAL API call to Claude Sonnet...`);
+      
+      const systemPrompt = params.system || `You are Claude Sonnet 4, the reasoning engine in a unified AI development system. 
+Your role is to create detailed execution plans for software development tasks.
+
+Given a user request, generate a structured execution plan with these step types:
+- "analysis": Analyze requirements or existing code
+- "code_generation": Generate new code
+- "code_modification": Modify existing code  
+- "reasoning": Perform complex reasoning
+- "tool_use": Use a specific tool
+
+For each step, provide:
+- type: one of the above
+- spec: detailed specification for the step
+- description: human-readable description
+
+Respond in this JSON format:
+{
+  "steps": [
+    {
+      "type": "analysis", 
+      "spec": {"query": "specific analysis needed"},
+      "description": "Analyze the requirements"
+    }
+  ],
+  "reasoning": "Your step-by-step thinking process"
+}`;
+
+      const response = await this.client.messages.create({
+        model: 'claude-3-5-sonnet-20241022',
+        max_tokens: 4000,
+        temperature: 0.1,
+        system: systemPrompt,
+        messages: [
+          {
+            role: 'user',
+            content: params.prompt
           }
         ]
-      },
-      reasoningTrace: [
-        'Analyzed user request for complexity and requirements',
-        'Identified need for both analysis and implementation phases',
-        'Selected appropriate tools and sequencing'
-      ]
-    };
+      });
+
+      const content = response.content[0];
+      if (content.type !== 'text') {
+        throw new Error('Unexpected response type from Claude');
+      }
+
+      console.log(`[ClaudeApiClient] Claude responded with ${content.text.length} characters`);
+
+      // Try to parse JSON from Claude's response
+      let planData;
+      let reasoningTrace: string[] = [];
+      
+      try {
+        // Look for JSON in the response
+        const jsonMatch = content.text.match(/\{[\s\S]*\}/);
+        if (jsonMatch) {
+          const parsed = JSON.parse(jsonMatch[0]);
+          planData = parsed;
+          if (parsed.reasoning) {
+            reasoningTrace = [parsed.reasoning];
+          }
+        } else {
+          // Fallback: create a simple plan from the text response
+          planData = {
+            steps: [
+              {
+                type: 'analysis',
+                spec: { query: params.prompt },
+                description: 'Analyze the user request based on Claude response'
+              }
+            ]
+          };
+          reasoningTrace = [content.text];
+        }
+      } catch (parseError) {
+        console.warn('[ClaudeApiClient] Failed to parse JSON from Claude, using text as reasoning');
+        planData = {
+          steps: [
+            {
+              type: 'analysis', 
+              spec: { query: params.prompt },
+              description: 'Analyze the user request'
+            }
+          ]
+        };
+        reasoningTrace = [content.text];
+      }
+
+      return { planData, reasoningTrace };
+    } catch (error) {
+      console.error('[ClaudeApiClient] Error calling Claude API:', error);
+      // Fallback plan
+      return {
+        planData: {
+          steps: [
+            {
+              type: 'analysis',
+              spec: { query: params.prompt },
+              description: 'Fallback: Analyze the user request'
+            }
+          ]
+        },
+        reasoningTrace: [`Error occurred: ${error instanceof Error ? error.message : String(error)}`]
+      };
+    }
   }
 
   async complete(params: {
@@ -63,11 +143,33 @@ class ClaudeApiClient {
     temperature?: number;
     system?: string;
   }): Promise<string> {
-    console.log(`[ClaudeApiClient] Claude completing prompt (first 50): ${params.prompt.substring(0, 50)}...`);
-    
-    // Mock completion response
-    return `Claude Sonnet response for: "${params.prompt.substring(0, 30)}..." 
-Generated with temperature ${params.temperature || 0.7} and max tokens ${params.maxTokens || 1000}.`;
+    try {
+      console.log(`[ClaudeApiClient] Making REAL completion call to Claude...`);
+      
+      const response = await this.client.messages.create({
+        model: 'claude-3-5-sonnet-20241022',
+        max_tokens: params.maxTokens || 1000,
+        temperature: params.temperature || 0.7,
+        system: params.system,
+        messages: [
+          {
+            role: 'user',
+            content: params.prompt
+          }
+        ]
+      });
+
+      const content = response.content[0];
+      if (content.type !== 'text') {
+        throw new Error('Unexpected response type from Claude');
+      }
+
+      console.log(`[ClaudeApiClient] Claude completion: ${content.text.length} characters`);
+      return content.text;
+    } catch (error) {
+      console.error('[ClaudeApiClient] Error in completion call:', error);
+      return `Error: ${error instanceof Error ? error.message : String(error)}`;
+    }
   }
 }
 
@@ -79,7 +181,7 @@ export class ClaudeSonnetOptimized {
   private apiClient: ClaudeApiClient;
 
   constructor(config: ClaudeSonnetConfig) {
-    this.apiClient = new ClaudeApiClient(config.apiKey, config.apiEndpoint);
+    this.apiClient = new ClaudeApiClient(config.apiKey);
 
     this.reasoningCache = new ReasoningCache({
       maxEntries: config.reasoningCacheMaxEntries || 10000,

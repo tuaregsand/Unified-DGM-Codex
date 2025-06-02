@@ -1,0 +1,61 @@
+{
+  "runId": "f35bb605-13a3-4682-9dcd-596deb6b4b57",
+  "timestamp": "2025-06-02T17:32:35.286Z",
+  "results": {
+    "sweBench": {
+      "score": 64,
+      "total": 50,
+      "passed": 32,
+      "failed": 18,
+      "duration": 113068
+    },
+    "humanEval": {
+      "score": 61.66666666666667,
+      "total": 60,
+      "passed": 37,
+      "failed": 23,
+      "duration": 79728
+    },
+    "polyglot": {
+      "score": 45,
+      "total": 60,
+      "passed": 27,
+      "failed": 33,
+      "duration": 122376
+    }
+  },
+  "config": {
+    "sweBench": {
+      "enabled": true,
+      "sampleSize": 100,
+      "timeout": 300000,
+      "categories": [
+        "bug-fix",
+        "feature-implementation"
+      ]
+    },
+    "humanEval": {
+      "enabled": true,
+      "languages": [
+        "python",
+        "javascript",
+        "typescript"
+      ],
+      "timeout": 120000
+    },
+    "polyglot": {
+      "enabled": true,
+      "languages": [
+        "python",
+        "javascript",
+        "typescript",
+        "java"
+      ],
+      "difficulty": "all"
+    },
+    "custom": {
+      "enabled": false,
+      "testSuites": []
+    }
+  }
+}
