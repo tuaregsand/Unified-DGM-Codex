@@ -1,0 +1,2 @@
+# This file ensures the memory-graphs directory is preserved in git
+# Project memory graphs will be stored here during runtime 

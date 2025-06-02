@@ -1,0 +1,2 @@
+# This file ensures the vector-index directory is preserved in git
+# FAISS vector indexes will be stored here during runtime 

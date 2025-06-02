@@ -1,0 +1,2 @@
+# This file ensures the evolution-history directory is preserved in git
+# DGM evolution logs and history will be stored here during runtime 

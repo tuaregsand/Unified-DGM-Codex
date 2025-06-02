@@ -1,0 +1,98 @@
+# Dependencies
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+package-lock.json
+yarn.lock
+
+# TypeScript build outputs
+dist/
+build/
+*.tsbuildinfo
+
+# Environment variables
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# IDE and Editor files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Logs
+logs/
+*.log
+*.log.*
+
+# Runtime data
+pids/
+*.pid
+*.seed
+*.pid.lock
+
+# Coverage directory used by tools like istanbul
+coverage/
+*.lcov
+
+# Test files
+.nyc_output/
+test-results/
+
+# Cache directories
+.npm/
+.eslintcache
+.cache/
+.parcel-cache/
+
+# Redis dumps
+dump.rdb
+
+# Vector database files
+data/vector-index/**/*.faiss
+data/vector-index/**/*.bin
+
+# Cache data
+data/cache/**/*
+!data/cache/.gitkeep
+
+# Memory graphs
+data/memory-graphs/**/*.json
+!data/memory-graphs/.gitkeep
+
+# Evolution history
+data/evolution-history/**/*
+!data/evolution-history/.gitkeep
+
+# Docker volumes
+.docker/
+
+# Temporary files
+tmp/
+temp/
+
+# AI model checkpoints and large files
+*.ckpt
+*.pth
+*.safetensors
+*.bin
+*.h5
+
+# API keys and sensitive data
+secrets/
+keys/
+credentials/ 

@@ -1,0 +1,2 @@
+# This file ensures the cache directory is preserved in git
+# Cache files will be stored here during runtime 
