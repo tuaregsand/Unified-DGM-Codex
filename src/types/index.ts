@@ -432,4 +432,211 @@ export interface ModelEvent extends SystemEvent {
   operation: string;
   duration?: number;
   tokens?: number;
-} 
+}
+
+// ====== DGM Evolution Engine Types ======
+
+export interface Hypothesis {
+  id: string;
+  description: string;
+  type: 'parameter-tuning' | 'architecture-change' | 'prompt-optimization' | 'model-optimization';
+  targetComponent: string;
+  proposedChanges: Record<string, any>;
+  expectedImprovement: number; // Percentage improvement expected
+  priority: 'low' | 'medium' | 'high';
+  riskLevel: 'low' | 'medium' | 'high';
+  estimatedDuration: number; // Minutes
+  generatedBy: 'analysis' | 'pattern' | 'llm' | 'manual';
+  metadata?: Record<string, any>;
+}
+
+export interface TestResult {
+  hypothesisId: string;
+  success: boolean;
+  improvement: number; // Actual improvement achieved
+  mutations: Mutation[];
+  benchmarkResults: BenchmarkResults;
+  duration: number;
+  errors?: string[];
+  rollbackRequired: boolean;
+  metadata?: Record<string, any>;
+}
+
+export interface Mutation {
+  id: string;
+  type: 'file-modification' | 'config-change' | 'parameter-update' | 'prompt-template-change';
+  targetFile?: string;
+  originalValue: any;
+  newValue: any;
+  description: string;
+  safetyChecks: string[];
+  rollbackData: any;
+}
+
+export interface EvolutionCycle {
+  id: string;
+  startTime: Date;
+  endTime?: Date;
+  phase: 'benchmark' | 'hypothesis-generation' | 'testing' | 'application' | 'complete' | 'failed';
+  baseline: BenchmarkResults;
+  hypotheses: Hypothesis[];
+  testResults: TestResult[];
+  appliedImprovements: string[]; // hypothesis IDs
+  totalImprovement: number;
+  duration?: number;
+  metadata?: Record<string, any>;
+}
+
+export interface BenchmarkConfig {
+  sweBench: {
+    enabled: boolean;
+    sampleSize?: number;
+    timeout?: number;
+    categories?: string[];
+  };
+  humanEval: {
+    enabled: boolean;
+    languages?: string[];
+    timeout?: number;
+  };
+  polyglot: {
+    enabled: boolean;
+    languages?: string[];
+    difficulty?: 'easy' | 'medium' | 'hard' | 'all';
+  };
+  custom: {
+    enabled: boolean;
+    testSuites?: string[];
+  };
+}
+
+export interface EvolutionMetrics {
+  cyclesCompleted: number;
+  totalImprovements: number;
+  averageImprovement: number;
+  successRate: number;
+  rollbackRate: number;
+  avgCycleDuration: number;
+  bestPerformance: BenchmarkResults;
+  currentPerformance: BenchmarkResults;
+  history: EvolutionCycle[];
+}
+
+export interface HypothesisGenerationContext {
+  currentMetrics: BenchmarkResults;
+  historicalMetrics: BenchmarkResults[];
+  systemAnalysis: SystemAnalysis;
+  recentFailures?: string[];
+  performanceBottlenecks?: string[];
+  userFeedback?: string[];
+}
+
+export interface SystemAnalysis {
+  performanceProfile: PerformanceProfile;
+  bottlenecks: Bottleneck[];
+  resourceUtilization: ResourceUtilization;
+  errorPatterns: ErrorPattern[];
+  codeQualityMetrics: CodeQualityMetrics;
+}
+
+export interface PerformanceProfile {
+  tokenEfficiency: number;
+  responseTime: number;
+  accuracy: number;
+  contextUtilization: number;
+  cacheHitRate: number;
+  modelUtilization: Record<string, number>;
+}
+
+export interface Bottleneck {
+  component: string;
+  type: 'performance' | 'accuracy' | 'resource' | 'logic';
+  severity: 'low' | 'medium' | 'high' | 'critical';
+  description: string;
+  impact: number; // Estimated performance impact percentage
+  possibleSolutions: string[];
+}
+
+export interface ResourceUtilization {
+  cpu: number;
+  memory: number;
+  network: number;
+  modelApiCalls: number;
+  cacheUsage: number;
+  diskIo: number;
+}
+
+export interface ErrorPattern {
+  type: string;
+  frequency: number;
+  component: string;
+  description: string;
+  examples: string[];
+  suggestedFixes: string[];
+}
+
+export interface CodeQualityMetrics {
+  complexity: number;
+  maintainability: number;
+  testCoverage: number;
+  codeSmells: number;
+  duplicateCode: number;
+  technicalDebt: number;
+}
+
+export interface GitBranch {
+  name: string;
+  commit: string;
+  created: Date;
+  type: 'experiment' | 'rollback' | 'main';
+  metadata?: Record<string, any>;
+}
+
+export interface Checkpoint {
+  id: string;
+  timestamp: Date;
+  branch: string;
+  commit: string;
+  systemState: SystemState;
+  benchmarkResults?: BenchmarkResults;
+  description: string;
+}
+
+export interface SystemState {
+  codeVersion: string;
+  configuration: Record<string, any>;
+  modelStates: Record<string, any>;
+  cacheState?: any;
+  performanceMetrics: PerformanceMetrics;
+}
+
+export interface RollbackPlan {
+  checkpointId: string;
+  mutations: Mutation[];
+  verification: VerificationStep[];
+  estimatedDuration: number;
+  riskAssessment: string;
+}
+
+export interface VerificationStep {
+  type: 'compile' | 'test' | 'benchmark' | 'manual';
+  description: string;
+  command?: string;
+  expectedResult?: any;
+  timeout?: number;
+}
+
+export interface EvolutionConfig {
+  enabled: boolean;
+  schedule: string; // Cron format
+  maxCyclesPerDay: number;
+  minImprovementThreshold: number; // Minimum improvement % to apply
+  maxRiskLevel: 'low' | 'medium' | 'high';
+  autoApprovalThreshold: number; // Auto-apply if improvement > threshold
+  benchmarkConfig: BenchmarkConfig;
+  parallelHypotheses: number;
+  backupRetention: number; // Days to keep backups
+}
+
+// Additional exports for backward compatibility
+export type { Tool, BenchmarkResults, BenchmarkResult }; 
