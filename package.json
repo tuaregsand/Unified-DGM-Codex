@@ -21,6 +21,7 @@
     "lint:fix": "eslint \"src/**/*.ts\" \"tests/**/*.ts\" --fix",
     "format": "prettier --write \"src/**/*.ts\" \"tests/**/*.ts\" \"config/**/*.yaml\" \"*.md\"",
     "format:check": "prettier --check \"src/**/*.ts\" \"tests/**/*.ts\" \"config/**/*.yaml\" \"*.md\"",
+    "type-check": "tsc --noEmit",
     "setup": "./scripts/setup.sh",
     "benchmark": "./scripts/benchmark.sh",
     "evolve": "npm run build && node dist/cli/index.js evolve"
